@@ -1,58 +1,15 @@
 import React from 'react';
+import Grid from "./Components/Grid";
+import Button from "./Components/Button";
 import './App.css';
 
-class Box extends React.Component{
-  selectBox = () => {
-    this.props.selectBox(this.props.row, this.props.col)
-  }
-  render(){
-    return(
-      <div
-      className = {this.props.boxClass}
-      id = {this.props.id}
-      onClick = {this.selectBox}
-      />
-    )
-  }
-}
-
-class Grid extends React.Component{
-  render() {
-    const width = ( this.props.cols * 16) +1;
-    var rowsArr = []
-
-    var boxClass = "";
-    for (var i = 0; i< this.props.rows; i++) {
-      for (var j = 0; j < this.props.cols; j++) {
-        let boxId = i + "_" + j;
-
-        boxClass = this.props.gridFull[i][j] ? "box on" : "box off";
-        rowsArr.push(
-          <Box 
-          boxClass = {boxClass}
-          key = {boxId}
-          boxId = {boxId}
-          row = {i}
-          col = {j}
-          selectBox = {this.props.selectBox}
-          /> 
-        )
-      }
-    }
-    return(
-      <div className="grid" style={{width: width}}>
-        {rowsArr}
-      </div>
-    )
-  }
-}
 
 class App extends React.Component {
   constructor() {
     super();
     this.speed = 100;
-    this.rows = 30;
-    this.cols = 50;
+    this.rows = 35;
+    this.cols = 55;
 
     this.state = {
       generation: 0,
@@ -90,6 +47,37 @@ class App extends React.Component {
   stopButton =() => {
     clearInterval(this.intervalId)
   }
+
+  slow = () => {
+    this.speed = 800;
+    this.playButton();
+  }
+
+  fast = () => {
+    this.speed = 100;
+    this.playButton();
+  }
+
+  clear =()=> {
+    var grid = Array(this.rows).fill().map(() => Array(this.cols).fill(false));
+    this.setState({
+      gridFull: grid,
+      generation: 0
+    })
+  }
+
+  gridSize = () => {
+    this.cols = 25;
+    this.rows = 25;
+    this.clear()
+  }
+
+  normalSize = () => {
+    this.cols = 55;
+    this.rows = 35;
+    this.clear()
+  }
+
   play =() => {
     let g = this.state.gridFull;
     let g2 = array(this.state.gridFull);
@@ -97,10 +85,10 @@ class App extends React.Component {
     for(let i =0; i< this.rows; i++) {
       for(let j = 0; j< this.cols; j++) {
         let count = 0;
-        if (i>0) if(g[i - 1] [j]) count++;
+        if (i>0) if(g[i - 1][j]) count++;
         if (i>0 && j>0) if (g[i-1][j -1]) count++;
         if (i> 0 && j < this.cols -1) if (g[i-1][j+1]) count ++;
-        if(j<this.cols -1) if(g[i] [j +1]) count ++;
+        if(j<this.cols -1) if(g[i][j +1]) count ++;
         if (j>0) if(g[i] [j-1]) count++;
         if (i< this.rows -1) if (g[i+1][j])count++;
         if (i< this.rows -1 && j>0) if (g[i +1] [j-1])count++;
@@ -124,6 +112,33 @@ class App extends React.Component {
     return (
     <div>
       <h1>The Game of Life</h1>
+      <div className = "text">
+        <h2>Rules:</h2> 
+
+        The universe of the Game of Life is an infinite, two-dimensional orthogonal grid of square cells, each of which is in one of two possible states, live or dead, (or populated and unpopulated, respectively). Every cell interacts with its eight neighbours, which are the cells that are horizontally, vertically, or diagonally adjacent. At each step in time, the following transitions occur:
+
+        <p>Any live cell with fewer than two live neighbours dies, as if by underpopulation.</p>
+        <p>Any live cell with two or three live neighbours lives on to the next generation.</p>
+        <p>Any live cell with more than three live neighbours dies, as if by overpopulation.</p>
+        <p>Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+        These rules, which compare the behavior of the automaton to real life, can be condensed into the following:
+        </p>
+        <p>
+        Any live cell with two or three live neighbours survives.
+        Any dead cell with three live neighbours becomes a live cell.
+        All other live cells die in the next generation. Similarly, all other dead cells stay dead.
+        </p>
+      </div>
+      <Button
+      playButton = {this.playButton}
+      stopButton = {this.stopButton}
+      clear = {this.clear}
+      seed = {this.seed}
+      slow = {this.slow}
+      fast = {this.fast}
+      gridSize = {this.gridSize}
+      normalSize = {this.normalSize}
+      />
       <Grid
       gridFull = {this.state.gridFull}
       rows = {this.rows}
